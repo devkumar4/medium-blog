@@ -1,14 +1,21 @@
-import { Appbar } from "../components/Appbar";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 
 import { ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from "../components/Spinner";
+import { Appbar } from "../components/Appbar";
+import { toast } from "sonner";
 
 export const Publish = () => {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
+
+  console.log(description);
+
   const navigate = useNavigate();
+
   return (
     <div>
       <Appbar />
@@ -27,26 +34,35 @@ export const Publish = () => {
               setDescription(e.target.value);
             }}
           />
+
           <button
             type="submit"
-            className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+            className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 mt-4"
             onClick={async () => {
-              const res = await axios.post(
-                `${BACKEND_URL}/api/v1/blog`,
-                {
-                  title,
-                  content: description,
-                },
-                {
-                  headers: {
-                    Authorization: localStorage.getItem("token"),
+              try {
+                setLoading(true);
+                const res = await axios.post(
+                  `${BACKEND_URL}/api/v1/blog`,
+
+                  {
+                    title,
+                    content: description,
                   },
-                }
-              );
-              navigate(`/blog/${res.data.id}`);
+                  {
+                    headers: {
+                      Authorization: localStorage.getItem("token"),
+                    },
+                  }
+                );
+
+                navigate(`/blog/${res.data.id}`);
+              } catch (error) {
+                setLoading(false);
+                toast.error("Invalid Credentials ");
+              }
             }}
           >
-            Publish
+            {loading ? <Spinner size={6} /> : "Publish"}
           </button>
         </div>
       </div>

@@ -4,26 +4,41 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 import { toast } from "sonner";
+import { Spinner } from "./Spinner";
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
+  const [loading, setLoading] = useState(false);
   const [postInputs, setPostInputs] = useState<SignupInput>({
     name: "",
     username: "",
     password: "",
   });
   const navigate = useNavigate();
+  console.log(postInputs);
 
   async function sendRequest() {
     try {
+      setLoading(true);
       const response = await axios.post(
         `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,
         postInputs
       );
       const jwt = response.data;
+      console.log(jwt, "Devvvv");
 
       localStorage.setItem("token", jwt.jwt);
-      navigate("/blogs");
+      localStorage.setItem("name", jwt.user);
+      {
+        type === "signup"
+          ? toast.success("Go ahead and sign !")
+          : toast.success("Account Created 🎊");
+      }
+
+      {
+        type === "signup" ? navigate("/signin") : navigate("/blogs");
+      }
     } catch (error) {
+      setLoading(false);
       toast.error(
         "Oops! The email or password you entered is incorrect. Please try again."
       );
@@ -85,9 +100,17 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             <button
               type="button"
               onClick={sendRequest}
-              className="mt-8 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+              className="mt-8 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 "
             >
-              {type === "signin" ? "Sign in" : " Sign up"}
+              {loading ? (
+                <div className="flex justify-center">
+                  <Spinner size={4} />
+                </div>
+              ) : type === "signin" ? (
+                "Sign in"
+              ) : (
+                "Sign up"
+              )}
             </button>
           </div>
         </div>

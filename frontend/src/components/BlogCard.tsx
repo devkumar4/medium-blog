@@ -5,15 +5,15 @@ interface BlogCardProps {
   authorName: string;
   title: string;
   content: string;
-  publishedDate: string;
+  date: string;
 }
 
 export const Blogcard = ({
   authorName,
   title,
   id,
+  date,
   content,
-  publishedDate,
 }: BlogCardProps) => {
   return (
     <Link to={`/blog/${id}`}>
@@ -30,7 +30,7 @@ export const Blogcard = ({
           </div>
           <div className="pl-2 font-thin text-slate-400 text-sm flex justify-center flex-col">
             {" "}
-            {publishedDate}
+            {date}
           </div>
         </div>
         <div className="text-xl font-semibold pt-2">{title}</div>
